@@ -34,6 +34,22 @@ class ShopResponse
         ], $filteredResponseCode)->header('Content-Type', self::$JSON_CONTENT_TYPE);
     }
 
+    static function getListResponse($code, $message, $status, $data, Request $request) {
+        $filteredResponseCode = self::getFilteredResponseCode($code);
+        $filteredMessage = self::getFilteredMessage($message);
+        $currentDate = new Datetime();
+
+        return response([
+            "code" => $filteredResponseCode,
+            "message" => $filteredMessage,
+            "status" => $status,
+            "path" => $request->fullUrl(),
+            "timestamp" => $currentDate->format('U') + 0,
+            "data" => $data,
+            "size" => count($data)
+        ], $filteredResponseCode)->header('Content-Type', self::$JSON_CONTENT_TYPE);
+    }
+
     static function getErrorResponse(\Exception $exception, Request $request) {
         $currentDate = new Datetime();
         $responseCode = self::getFilteredResponseCode(self::$NO_CONTENT_RESPONSE);
@@ -47,6 +63,31 @@ class ShopResponse
             "errorMessage" => $exception->getMessage(),
             "stackTrace"=> $exception->getTraceAsString()
         ], $responseCode)->header('Content-Type', self::$JSON_CONTENT_TYPE);
+    }
+
+    static function getNotFoundResponse($code, Request $request) {
+        $currentDate = new Datetime();
+        $filteredResponseCode = self::getFilteredResponseCode($code);
+        return response([
+            "code" => $filteredResponseCode,
+            "message" => "No Data Found",
+            "status" => true,
+            "path" => $request->fullUrl(),
+            "timestamp" => $currentDate->format('U') + 0
+        ], $filteredResponseCode)->header('Content-Type', self::$JSON_CONTENT_TYPE);
+    }
+
+    static function getNotFoundListResponse($code, Request $request) {
+        $currentDate = new Datetime();
+        $filteredResponseCode = self::getFilteredResponseCode($code);
+        return response([
+            "code" => $filteredResponseCode,
+            "message" => "No Data Found",
+            "status" => true,
+            "path" => $request->fullUrl(),
+            "timestamp" => $currentDate->format('U') + 0,
+            "data" => array()
+        ], $filteredResponseCode)->header('Content-Type', self::$JSON_CONTENT_TYPE);
     }
 
     public static function getFilteredResponseCode($code)

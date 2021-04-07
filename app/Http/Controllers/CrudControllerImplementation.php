@@ -9,7 +9,7 @@ interface CrudControllerImplementation {
 
     function getAll(Request $request, Response $response);
 
-    function getById(Request $request, Response $response);
+    function getById(Request $request, Response $response, $id);
 
     function deleteById(Request $request, Response $response);
 

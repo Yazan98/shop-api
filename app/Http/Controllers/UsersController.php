@@ -8,6 +8,7 @@ use CrudControllerImplementation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 include("CrudControllerImplementation.php");
 
@@ -18,16 +19,16 @@ class UsersController extends Controller implements CrudControllerImplementation
     {
         try {
             $newUserId = DB::table(User::$TABLE_NAME)->insertGetId(array(
-                "name" => "dsljkfhnasdsksadldf",
-                "image" => "dfsdfsefsesdffseasdfsefsefsef",
-                "password" => "sdfkjlsdlasdfsdkfjslekfsef",
-                "email" => "dfslefjlsasdsdfefsef",
-                "gender" => "Malasdfsde",
-                "age" => 15,
-                "phone_number" => "sd;lfjsasdfsddef",
-                "location_lat" => 15.2,
-                "location_lng" => 1548.2,
-                "location_name" => "6assdfd51asd"
+                "name" => $request->input('name'),
+                "image" => $request->input('image'),
+                "password" => Hash::make($request->input('password')),
+                "email" => $request->input('email'),
+                "gender" => $request->input('gender'),
+                "age" => $request->input('age'),
+                "phone_number" => $request->input('phone_number'),
+                "location_lat" => $request->input('location_lat'),
+                "location_lng" => $request->input('location_lng'),
+                "location_name" => $request->input('location_name')
             ));
             $newInsertedUser = self::getEntityById($newUserId);
             return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $newInsertedUser, $request);
@@ -39,7 +40,17 @@ class UsersController extends Controller implements CrudControllerImplementation
 
     function getAll(Request $request, Response $response)
     {
-
+        try {
+            $allUsers = DB::table(User::$TABLE_NAME)->get();
+            if ($allUsers != null) {
+                return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $allUsers, $request);
+            } else {
+                return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
+            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
     }
 
     public function getEntityById($id)
@@ -50,9 +61,19 @@ class UsersController extends Controller implements CrudControllerImplementation
             ->get();
     }
 
-    function getById(Request $request, Response $response)
+    function getById(Request $request, Response $response, $id)
     {
-        // TODO: Implement getById() method.
+        try {
+            $user = self::getEntityById($id)->first();
+            if ($user != null) {
+                return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $user, $request);
+            } else {
+                return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
+            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
     }
 
     function deleteById(Request $request, Response $response)
