@@ -19,4 +19,6 @@ interface CrudControllerImplementation {
 
     function getAllDisabledEntities(Request $request, Response $response);
 
+    function getEntityById($id);
+
 }

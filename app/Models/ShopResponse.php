@@ -34,6 +34,21 @@ class ShopResponse
         ], $filteredResponseCode)->header('Content-Type', self::$JSON_CONTENT_TYPE);
     }
 
+    static function getErrorResponse(\Exception $exception, Request $request) {
+        $currentDate = new Datetime();
+        $responseCode = self::getFilteredResponseCode(self::$NO_CONTENT_RESPONSE);
+        return response([
+            "code" =>$responseCode ,
+            "message" => "Failed",
+            "status" => false,
+            "path" => $request->fullUrl(),
+            "timestamp" => $currentDate->format('U') + 0,
+            "error" => $exception->getCode(),
+            "errorMessage" => $exception->getMessage(),
+            "stackTrace"=> $exception->getTraceAsString()
+        ], $responseCode)->header('Content-Type', self::$JSON_CONTENT_TYPE);
+    }
+
     public static function getFilteredResponseCode($code)
     {
         switch ($code) {
