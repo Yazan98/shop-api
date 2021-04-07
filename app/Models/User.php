@@ -29,6 +29,33 @@ class User extends Authenticatable
     public static $TYPE = "type";
     public static $CREATED_AT = "created_at";
     public static $IS_ENABLED = "is_enabled";
+    public static $IS_ACCOUNT_ACTIVATED = 'is_account_activated';
+    public static $ACCOUNT_STATUS = 'status';
+    public static $ACCOUNT_ID = 'id';
+
+    // Supported Fields
     public static $GENDER_SUPPORTED = ['Male', 'Female'];
     public static $TYPE_SUPPORTED = ['User', 'Admin', 'Shop'];
+
+    // Visible Fields
+    public static function getVisibleResponseAttributes() {
+        return [
+            self::$USERNAME,
+            self::$IMAGE,
+            self::$EMAIL,
+            self::$GENDER,
+            self::$AGE,
+            self::$PHONE_NUMBER,
+            self::$LOCATION_LAT,
+            self::$LOCATION_LNG,
+            self::$LOCATION_NAME,
+            self::$TYPE,
+            self::$CREATED_AT,
+            self::$IS_ENABLED,
+            self::$IS_ACCOUNT_ACTIVATED,
+            self::$ACCOUNT_STATUS,
+            self::$ACCOUNT_ID
+        ];
+    }
+
 }

@@ -10,8 +10,6 @@ interface ShopBaseServiceImplementation {
 
     function getAll(Request $request);
 
-    function getById(Request $request, $id);
-
     function deleteById(Request $request);
 
     function deleteAll(Request $request);

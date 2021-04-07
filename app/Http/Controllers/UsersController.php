@@ -24,7 +24,7 @@ class UsersController extends Controller implements CrudControllerImplementation
             if ($currentUserId == User::$USER_NOT_INSERTED) {
                 return ShopResponse::getErrorResponseWithoutException($request, "Something Error User Not Saved", ShopResponse::$INTERNAL_ERROR_RESPONSE);
             } else {
-                $newInsertedUser = self::getEntityById($currentUserId);
+                $newInsertedUser = $userService->getEntityById($currentUserId);
                 return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $newInsertedUser, $request);
             }
         } catch (\Exception $exception) {
@@ -35,9 +35,10 @@ class UsersController extends Controller implements CrudControllerImplementation
     function getAll(Request $request, Response $response)
     {
         try {
-            $allUsers = DB::table(User::$TABLE_NAME)->get();
-            if ($allUsers != null) {
-                return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $allUsers, $request);
+            $service = new UserService();
+            $users = $service->getAll($request);
+            if ($users != null) {
+                return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $users, $request);
             } else {
                 return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
             }
@@ -47,23 +48,27 @@ class UsersController extends Controller implements CrudControllerImplementation
         }
     }
 
-    public function getEntityById($id)
-    {
-        return DB::table(User::$TABLE_NAME)
-            ->where('id', $id)
-            ->lockForUpdate()
-            ->get();
-    }
-
     function getById(Request $request, Response $response, $id)
     {
         try {
-            $user = self::getEntityById($id)->first();
+            $user = new UserService();
+            $currentUser = $user->getEntityById($id)->first();
             if ($user != null) {
-                return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $user, $request);
+                return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $currentUser, $request);
             } else {
                 return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
             }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
+    function refreshOtp(Request $request) {
+        try {
+            $user = new UserService();
+            $currentUser = $user->refreshOtpCode($request);
+            return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "Code Sent", true, $currentUser, $request);
         } catch (\Exception $exception) {
             echo $exception->getMessage();
             return ShopResponse::getErrorResponse($exception, $request);
@@ -77,7 +82,9 @@ class UsersController extends Controller implements CrudControllerImplementation
 
     function deleteAll(Request $request, Response $response)
     {
-        // TODO: Implement deleteAll() method.
+        $userService = new UserService();
+        $userService->deleteAll($request);
+        return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "Data Deleted Successfully", true, [], $request);
     }
 
     function getAllEnabledEntities(Request $request, Response $response)

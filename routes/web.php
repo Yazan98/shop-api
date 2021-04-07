@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,14 +19,16 @@ Route::get('/', function () {
 });
 
 // Users Controller
-Route::post(RouterPaths::$CREATE_USERS_PATH, [UsersController::class, RouterPaths::$CREATE_ENTITY_NAME]);
-Route::get(RouterPaths::$GET_ALL_USERS_PATH, [UsersController::class, RouterPaths::$GET_ALL_ENTITIES_NAME]);
-Route::get(RouterPaths::$GET_ALL_ENABLED_PATH, [UsersController::class, RouterPaths::$GET_ALL_ENABLED]);
-Route::get(RouterPaths::$GET_ALL_DISABLED_PATH, [UsersController::class, RouterPaths::$GET_ALL_DISABLED]);
-Route::get(RouterPaths::$GET_BY_ID_PATH, [UsersController::class, RouterPaths::$GET_BY_ID]);
-Route::delete(RouterPaths::$DELETE_ALL_PATH, [UsersController::class, RouterPaths::$DELETE_ALL]);
+Route::post(RouterPaths::getFullRequestPath(RouterPaths::$CREATE_USERS_PATH), [UsersController::class, RouterPaths::$CREATE_ENTITY_NAME]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$GET_ALL_USERS_PATH), [UsersController::class, RouterPaths::$GET_ALL_ENTITIES_NAME]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$GET_ALL_ENABLED_PATH), [UsersController::class, RouterPaths::$GET_ALL_ENABLED]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$GET_ALL_DISABLED_PATH), [UsersController::class, RouterPaths::$GET_ALL_DISABLED]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$GET_BY_ID_PATH), [UsersController::class, RouterPaths::$GET_BY_ID]);
+Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$DELETE_ALL_PATH), [UsersController::class, RouterPaths::$DELETE_ALL]);
+Route::post(RouterPaths::getFullRequestPath(RouterPaths::$REFRESH_OTP_PATH), [UsersController::class, RouterPaths::$REFRESH_OTP]);
 
-class RouterPaths {
+class RouterPaths
+{
     // Users Controller
     public static $CREATE_USERS_PATH = "/users/";
     public static $GET_ALL_USERS_PATH = "/users";
@@ -34,6 +36,7 @@ class RouterPaths {
     public static $DELETE_ALL_PATH = "/users";
     public static $GET_ALL_ENABLED_PATH = "/users/enabled";
     public static $GET_ALL_DISABLED_PATH = "/users/disabled";
+    public static $REFRESH_OTP_PATH = "/users/otp/refresh";
 
     // Common Controller Methods
     public static $CREATE_ENTITY_NAME = "saveEntity";
@@ -42,4 +45,10 @@ class RouterPaths {
     public static $DELETE_ALL = "deleteAll";
     public static $GET_ALL_ENABLED = "getAllEnabledEntities";
     public static $GET_ALL_DISABLED = "getAllDisabledEntities";
+    public static $REFRESH_OTP = "refreshOtp";
+
+    public static function getFullRequestPath($request)
+    {
+        return "/api/v1" . $request;
+    }
 }

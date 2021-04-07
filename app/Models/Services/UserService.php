@@ -3,8 +3,10 @@
 namespace App\Models\Services;
 
 use App\Exceptions\BadInformationException;
+use App\Models\PhoneNumber;
 use App\Models\Services\Validations\ShopStringValidation;
 use App\Models\User;
+use App\Models\UserCreationSender;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -51,22 +53,30 @@ class UserService implements ShopBaseServiceImplementation
             ShopStringValidation::validateEmail($email, "Invalid Email Please Write Good Email To Continue");
             ShopStringValidation::validateStringMinLength($password, "User Password Length Required Min 8 (Field password)", 8);
             ShopStringValidation::validateStringMaxLength($password, "User Password Length Required Max 25 (Field password)", 25);
+
+            // Database Validation
             if (self::isPhoneNumberAlreadyExists($phoneNumber)) {
                 throw new BadInformationException( "Phone Number Already Used ...");
             } elseif (self::isEmailAlreadyExists($email)) {
                 throw new BadInformationException( "Email Already Used ...");
             }
 
-            if (!ShopStringValidation::isStringsEquals(User::$GENDER_SUPPORTED[0], $gender) || !ShopStringValidation::isStringsEquals(User::$GENDER_SUPPORTED[1], $gender)) {
+            // User Input Validation
+            if (ShopStringValidation::isStringsEquals(User::$GENDER_SUPPORTED[0], $gender) || ShopStringValidation::isStringsEquals(User::$GENDER_SUPPORTED[1], $gender)) {
+                // Gender Type Supported
+            } else {
                 throw new BadInformationException( "Gender Type is Not Supported Please Enter Supported Type");
             }
 
-            if (!ShopStringValidation::isStringsEquals(User::$TYPE_SUPPORTED[0], $type) || !ShopStringValidation::isStringsEquals(User::$TYPE_SUPPORTED[1], $type) || !ShopStringValidation::isStringsEquals(User::$TYPE_SUPPORTED[2], $type)) {
+            // User Input Validation
+            if (ShopStringValidation::isStringsEquals(User::$TYPE_SUPPORTED[0], $type) || ShopStringValidation::isStringsEquals(User::$TYPE_SUPPORTED[1], $type) || ShopStringValidation::isStringsEquals(User::$TYPE_SUPPORTED[2], $type)) {
+                // Account Type Supported
+            } else {
                 throw new BadInformationException( "Account Type is Not Supported Please Enter Supported Type");
             }
 
             // Validation Successful Create User Now
-            return DB::table(User::$TABLE_NAME)->insertGetId(array(
+            $newUserId = DB::table(User::$TABLE_NAME)->insertGetId(array(
                 User::$USERNAME => $name,
                 User::$IMAGE => $image,
                 User::$PASSWORD => Hash::make($password),
@@ -82,9 +92,62 @@ class UserService implements ShopBaseServiceImplementation
                 User::$TYPE => $type,
                 User::$CREATED_AT => Carbon::now(),
             ));
+
+            // Send SMS Message With Code
+            self::createVerificationCodePhoneNumberForNewUser($phoneNumber, $newUserId, $name, $email);
+            return $newUserId;
         } catch (\Exception $exception) {
             throw $exception;
         }
+    }
+
+    function createVerificationCodePhoneNumberForNewUser($phoneNumber, $id, $userName, $email) {
+        $verificationCode = self::getGeneratedVerificationCode();
+        DB::table(PhoneNumber::$TABLE_NAME)->insert(array(
+            PhoneNumber::$CODE => $verificationCode,
+            PhoneNumber::$CREATED_AT => Carbon::now(),
+            PhoneNumber::$USER_ID => $id
+        ));
+
+//        $userSender = new UserCreationSender($verificationCode, $phoneNumber, $email, $userName);
+//        $userSender->start();
+    }
+
+    /**
+     * @param Request $request
+     * @throws BadInformationException
+     */
+    function refreshOtpCode(Request $request) {
+        $id = $request->input(PhoneNumber::$USER_ID);
+        $user = self::getEntityById($id);
+        if ($user == null) {
+            throw new BadInformationException("UserId Invalid");
+        }
+
+        // THis Deleting Everything Should be For One User Only
+        DB::table(PhoneNumber::$TABLE_NAME)
+            ->where(PhoneNumber::$USER_ID, $id)
+            ->truncate();
+
+        $verificationCode = self::getGeneratedVerificationCode();
+        DB::table(PhoneNumber::$TABLE_NAME)->insert(array(
+            PhoneNumber::$CODE => $verificationCode,
+            PhoneNumber::$CREATED_AT => Carbon::now(),
+            PhoneNumber::$USER_ID => $id
+        ));
+
+//        $userSender = new UserCreationSender($verificationCode, $request->input(PhoneNumber::$PHONE_NUMBER), "", "");
+//        $userSender->start();
+    }
+
+    private function getGeneratedVerificationCode() {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < 6; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 
     function isPhoneNumberAlreadyExists($phoneNumber) {
@@ -93,7 +156,7 @@ class UserService implements ShopBaseServiceImplementation
             ->lockForUpdate()
             ->get();
 
-        return $userExists != null;
+        return $userExists != null && count($userExists) > 0;
     }
 
     function isEmailAlreadyExists($email) {
@@ -102,17 +165,14 @@ class UserService implements ShopBaseServiceImplementation
             ->lockForUpdate()
             ->get();
 
-        return $userExists != null;
+        return $userExists != null && count($userExists) > 0;
     }
 
     function getAll(Request $request)
     {
-        // TODO: Implement getAll() method.
-    }
-
-    function getById(Request $request, $id)
-    {
-        // TODO: Implement getById() method.
+        return DB::table(User::$TABLE_NAME)
+            ->select(User::getVisibleResponseAttributes())
+            ->get();
     }
 
     function deleteById(Request $request)
@@ -122,7 +182,7 @@ class UserService implements ShopBaseServiceImplementation
 
     function deleteAll(Request $request)
     {
-        // TODO: Implement deleteAll() method.
+        DB::table(User::$TABLE_NAME)->truncate();
     }
 
     function getAllEnabledEntities(Request $request)
@@ -135,8 +195,13 @@ class UserService implements ShopBaseServiceImplementation
         // TODO: Implement getAllDisabledEntities() method.
     }
 
-    function getEntityById($id)
+    public function getEntityById($id)
     {
-        // TODO: Implement getEntityById() method.
+        return DB::table(User::$TABLE_NAME)
+            ->select(User::getVisibleResponseAttributes())
+            ->where('id', $id)
+            ->lockForUpdate()
+            ->get();
     }
+
 }
