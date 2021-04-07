@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\BadInformationException;
+use App\Models\Services\UserService;
 use App\Models\ShopResponse;
 use App\Models\User;
 use CrudControllerImplementation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 include("CrudControllerImplementation.php");
 
@@ -18,22 +19,15 @@ class UsersController extends Controller implements CrudControllerImplementation
     function saveEntity(Request $request, Response $response)
     {
         try {
-            $newUserId = DB::table(User::$TABLE_NAME)->insertGetId(array(
-                "name" => $request->input('name'),
-                "image" => $request->input('image'),
-                "password" => Hash::make($request->input('password')),
-                "email" => $request->input('email'),
-                "gender" => $request->input('gender'),
-                "age" => $request->input('age'),
-                "phone_number" => $request->input('phone_number'),
-                "location_lat" => $request->input('location_lat'),
-                "location_lng" => $request->input('location_lng'),
-                "location_name" => $request->input('location_name')
-            ));
-            $newInsertedUser = self::getEntityById($newUserId);
-            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $newInsertedUser, $request);
+            $userService = new UserService();
+            $currentUserId = $userService->saveEntity($request);
+            if ($currentUserId == User::$USER_NOT_INSERTED) {
+                return ShopResponse::getErrorResponseWithoutException($request, "Something Error User Not Saved", ShopResponse::$INTERNAL_ERROR_RESPONSE);
+            } else {
+                $newInsertedUser = self::getEntityById($currentUserId);
+                return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $newInsertedUser, $request);
+            }
         } catch (\Exception $exception) {
-            echo $exception->getMessage();
             return ShopResponse::getErrorResponse($exception, $request);
         }
     }
@@ -88,11 +82,26 @@ class UsersController extends Controller implements CrudControllerImplementation
 
     function getAllEnabledEntities(Request $request, Response $response)
     {
-        // TODO: Implement getAllEnabledEntities() method.
+       return self::getAllEnabledDisabledEntities($request, $response, true);
     }
 
     function getAllDisabledEntities(Request $request, Response $response)
     {
-        // TODO: Implement getAllDisabledEntities() method.
+        return self::getAllEnabledDisabledEntities($request, $response, false);
+    }
+
+    function getAllEnabledDisabledEntities(Request $request, Response $response, $status)
+    {
+        try {
+            $allUsers = DB::table(User::$TABLE_NAME)->where(User::$IS_ENABLED, '=', $status)->get();
+            if ($allUsers != null) {
+                return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $allUsers, $request);
+            } else {
+                return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
+            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
     }
 }

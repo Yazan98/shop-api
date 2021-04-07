@@ -30,6 +30,7 @@ class CreateUsersTable extends Migration
             $table->double('location_lat');
             $table->double('location_lng');
             $table->string('location_name');
+            $table->boolean('is_enabled')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 100);
             $table->rememberToken();

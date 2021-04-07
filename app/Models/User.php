@@ -11,49 +11,24 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
     public static $TABLE_NAME = "users";
+    public static $USER_NOT_INSERTED = -1;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'gender',
-        'security_question',
-        'security_question_answer',
-        'type',
-        'status',
-        'image',
-        'age',
-        'is_account_activated',
-        'is_account_enabled',
-        'email',
-        'phone_number',
-        'email_verified_at',
-        'password'
-    ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
-    ];
+    // Database Attributes
+    public static $USERNAME = "name";
+    public static $IMAGE = "image";
+    public static $PASSWORD = "password";
+    public static $EMAIL = "email";
+    public static $GENDER = "gender";
+    public static $AGE = "age";
+    public static $PHONE_NUMBER = "phone_number";
+    public static $LOCATION_LAT = "location_lat";
+    public static $LOCATION_LNG = "location_lng";
+    public static $LOCATION_NAME = "location_name";
+    public static $SECURITY_QUESTION = "security_question";
+    public static $SECURITY_QUESTION_ANSWER = "security_question_answer";
+    public static $TYPE = "type";
+    public static $CREATED_AT = "created_at";
+    public static $IS_ENABLED = "is_enabled";
+    public static $GENDER_SUPPORTED = ['Male', 'Female'];
+    public static $TYPE_SUPPORTED = ['User', 'Admin', 'Shop'];
 }

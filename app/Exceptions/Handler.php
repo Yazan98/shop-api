@@ -2,8 +2,9 @@
 
 namespace App\Exceptions;
 
+use App\Models\ShopResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
+use Illuminate\Http\Request;
 
 class Handler extends ExceptionHandler
 {
@@ -34,8 +35,8 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->reportable(function (Request $request, \Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
         });
     }
 }
