@@ -3,6 +3,7 @@
 namespace App\Models\Services;
 
 use App\Exceptions\BadInformationException;
+use App\Models\GeneralApiKeys;
 use App\Models\PhoneNumber;
 use App\Models\Services\Validations\ShopStringValidation;
 use App\Models\User;
@@ -101,6 +102,53 @@ class UserService implements ShopBaseServiceImplementation
         }
     }
 
+    /**
+     * @param $id
+     * @param $verificationCode
+     * @throws BadInformationException
+     */
+    function verifyOtpCode($id, $verificationCode) {
+        ShopStringValidation::validateEmptyString($id, "User Id Key : Required");
+        ShopStringValidation::validateEmptyString($verificationCode, "Message Verification Code Required");
+        $targetUser = $this->getEntityById($id);
+        if ($targetUser == null) {
+            throw new BadInformationException("User Not Found For this Id Please Send Correct Data");
+        }
+
+        $savedVerificationCode = self::getVerificationCodeByUserId($id);
+        if (ShopStringValidation::isStringsEquals($savedVerificationCode, $verificationCode)) {
+            self::updateAccountToVerifiedAccount($id);
+            self::removeOldVerificationCodeByUserId($id);
+            return $this->getEntityById($id)->first();
+        } else {
+            throw new BadInformationException("Verification Code Invalid Please Send Correct Code Or Request New One");
+        }
+    }
+
+    private function removeOldVerificationCodeByUserId($id) {
+        DB::table(PhoneNumber::$TABLE_NAME)
+            ->where(PhoneNumber::$USER_ID, $id)
+            ->delete();
+    }
+
+    private function updateAccountToVerifiedAccount($id) {
+        DB::table(User::$TABLE_NAME)
+            ->where(User::$ACCOUNT_ID, $id)
+            ->update(array(
+                User::$IS_ACCOUNT_ACTIVATED => true,
+                User::$IS_ENABLED => true,
+                User::$ACCOUNT_STATUS => "VERIFIED",
+                User::$IS_ACCOUNT_ENABLED => true
+            ));
+    }
+
+    function getVerificationCodeByUserId($userId) {
+        return DB::table(PhoneNumber::$TABLE_NAME)
+            ->select(PhoneNumber::$CODE)
+            ->where(PhoneNumber::$USER_ID, $userId)
+            ->value(PhoneNumber::$CODE);
+    }
+
     function createVerificationCodePhoneNumberForNewUser($phoneNumber, $id, $userName, $email) {
         $verificationCode = self::getGeneratedVerificationCode();
         DB::table(PhoneNumber::$TABLE_NAME)->insert(array(
@@ -118,16 +166,15 @@ class UserService implements ShopBaseServiceImplementation
      * @throws BadInformationException
      */
     function refreshOtpCode(Request $request) {
-        $id = $request->input(PhoneNumber::$USER_ID);
+        $id = $request->input(GeneralApiKeys::$USER_ID);
         $user = self::getEntityById($id);
         if ($user == null) {
             throw new BadInformationException("UserId Invalid");
         }
 
-        // THis Deleting Everything Should be For One User Only
         DB::table(PhoneNumber::$TABLE_NAME)
             ->where(PhoneNumber::$USER_ID, $id)
-            ->truncate();
+            ->delete();
 
         $verificationCode = self::getGeneratedVerificationCode();
         DB::table(PhoneNumber::$TABLE_NAME)->insert(array(
@@ -148,6 +195,35 @@ class UserService implements ShopBaseServiceImplementation
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
         return $randomString;
+    }
+
+    /**
+     * @param $email
+     * @param $password
+     * @throws BadInformationException
+     */
+    function loginAccount($email, $password) {
+        ShopStringValidation::validateEmptyString($email, "Email Required Can't Be Empty");
+        ShopStringValidation::validateEmptyString($password, "Password Required Can't Be Empty");
+        $userQuery = self::getAccountByUserEmail($email);
+        $user = $userQuery->first();
+        if ($user == null) {
+            throw new BadInformationException("Incorrect Email Or Password Please Try Again");
+        }
+
+        $hashedPassword = $userQuery->value(User::$PASSWORD);
+        $userId = $userQuery->value(User::$ACCOUNT_ID);
+        ShopStringValidation::validateEmptyString($hashedPassword, "Hashed Password Can't By Empty");
+        if (Hash::check($password, $hashedPassword)) {
+            return $this->getEntityById($userId)->first();
+        } else {
+            throw new BadInformationException("Incorrect Email Or Password Please Try Again");
+        }
+    }
+
+    function getAccountByUserEmail($email) {
+        return DB::table(User::$TABLE_NAME)
+            ->where(User::$EMAIL, $email);
     }
 
     function isPhoneNumberAlreadyExists($phoneNumber) {

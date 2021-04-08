@@ -26,6 +26,8 @@ Route::get(RouterPaths::getFullRequestPath(RouterPaths::$GET_ALL_DISABLED_PATH),
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$GET_BY_ID_PATH), [UsersController::class, RouterPaths::$GET_BY_ID]);
 Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$DELETE_ALL_PATH), [UsersController::class, RouterPaths::$DELETE_ALL]);
 Route::post(RouterPaths::getFullRequestPath(RouterPaths::$REFRESH_OTP_PATH), [UsersController::class, RouterPaths::$REFRESH_OTP]);
+Route::post(RouterPaths::getFullRequestPath(RouterPaths::$VERIFY_OTP_PATH), [UsersController::class, RouterPaths::$VERIFY_OTP]);
+Route::post(RouterPaths::getFullRequestPath(RouterPaths::$LOGIN_PATH), [UsersController::class, RouterPaths::$LOGIN_NAME]);
 
 class RouterPaths
 {
@@ -37,6 +39,8 @@ class RouterPaths
     public static $GET_ALL_ENABLED_PATH = "/users/enabled";
     public static $GET_ALL_DISABLED_PATH = "/users/disabled";
     public static $REFRESH_OTP_PATH = "/users/otp/refresh";
+    public static $VERIFY_OTP_PATH = "/users/otp/verify";
+    public static $LOGIN_PATH = "/users/login";
 
     // Common Controller Methods
     public static $CREATE_ENTITY_NAME = "saveEntity";
@@ -46,6 +50,8 @@ class RouterPaths
     public static $GET_ALL_ENABLED = "getAllEnabledEntities";
     public static $GET_ALL_DISABLED = "getAllDisabledEntities";
     public static $REFRESH_OTP = "refreshOtp";
+    public static $VERIFY_OTP = "verifyOtpCode";
+    public static $LOGIN_NAME = "loginAccount";
 
     public static function getFullRequestPath($request)
     {

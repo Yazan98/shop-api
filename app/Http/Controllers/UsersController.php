@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\BadInformationException;
+use App\Models\GeneralApiKeys;
 use App\Models\Services\UserService;
 use App\Models\ShopResponse;
 use App\Models\User;
@@ -27,6 +27,18 @@ class UsersController extends Controller implements CrudControllerImplementation
                 $newInsertedUser = $userService->getEntityById($currentUserId);
                 return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $newInsertedUser, $request);
             }
+        } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
+    function loginAccount(Request $request) {
+        try {
+            $userService = new UserService();
+            $userEmail = $request->input(GeneralApiKeys::$EMAIL_KEY);
+            $userPassword = $request->input(GeneralApiKeys::$PASSWORD_KEY);
+            $targetUser = $userService->loginAccount($userEmail, $userPassword);
+            return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $targetUser, $request);
         } catch (\Exception $exception) {
             return ShopResponse::getErrorResponse($exception, $request);
         }
@@ -58,6 +70,19 @@ class UsersController extends Controller implements CrudControllerImplementation
             } else {
                 return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
             }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
+    function verifyOtpCode(Request $request) {
+        try {
+            $userId = $request->input(GeneralApiKeys::$USER_ID);
+            $verificationCode = $request->input(GeneralApiKeys::$VERIFICATION_CODE);
+            $service = new UserService();
+            $currentUser = $service->verifyOtpCode($userId, $verificationCode);
+            return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $currentUser, $request);
         } catch (\Exception $exception) {
             echo $exception->getMessage();
             return ShopResponse::getErrorResponse($exception, $request);

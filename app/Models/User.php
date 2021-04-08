@@ -30,6 +30,7 @@ class User extends Authenticatable
     public static $CREATED_AT = "created_at";
     public static $IS_ENABLED = "is_enabled";
     public static $IS_ACCOUNT_ACTIVATED = 'is_account_activated';
+    public static $IS_ACCOUNT_ENABLED = 'is_account_enabled';
     public static $ACCOUNT_STATUS = 'status';
     public static $ACCOUNT_ID = 'id';
 
@@ -54,7 +55,8 @@ class User extends Authenticatable
             self::$IS_ENABLED,
             self::$IS_ACCOUNT_ACTIVATED,
             self::$ACCOUNT_STATUS,
-            self::$ACCOUNT_ID
+            self::$ACCOUNT_ID,
+            self::$IS_ACCOUNT_ENABLED
         ];
     }
 
