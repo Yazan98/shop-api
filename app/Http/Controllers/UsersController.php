@@ -24,7 +24,7 @@ class UsersController extends Controller implements CrudControllerImplementation
             if ($currentUserId == User::$USER_NOT_INSERTED) {
                 return ShopResponse::getErrorResponseWithoutException($request, "Something Error User Not Saved", ShopResponse::$INTERNAL_ERROR_RESPONSE);
             } else {
-                $newInsertedUser = $userService->getEntityById($currentUserId);
+                $newInsertedUser = $userService->getEntityById($currentUserId)->first();
                 return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $newInsertedUser, $request);
             }
         } catch (\Exception $exception) {
@@ -38,6 +38,30 @@ class UsersController extends Controller implements CrudControllerImplementation
             $userEmail = $request->input(GeneralApiKeys::$EMAIL_KEY);
             $userPassword = $request->input(GeneralApiKeys::$PASSWORD_KEY);
             $targetUser = $userService->loginAccount($userEmail, $userPassword);
+            return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $targetUser, $request);
+        } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
+    function getSecurityQuestionByEmailAddress(Request $request) {
+        try {
+            $userService = new UserService();
+            $userEmail = $request->input(GeneralApiKeys::$EMAIL_KEY);
+            $targetUser = $userService->getSecurityQuestionByEmailAddress($userEmail);
+            return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $targetUser, $request);
+        } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
+    // Return Token Here to Use it When Reset the Password
+    function verifyBySecurityQuestion(Request $request) {
+        try {
+            $userService = new UserService();
+            $userEmail = $request->input(GeneralApiKeys::$EMAIL_KEY);
+            $answer = $request->input(GeneralApiKeys::$SECURITY_ANSWER);
+            $targetUser = $userService->verifyBySecurityQuestion($userEmail, $answer);
             return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $targetUser, $request);
         } catch (\Exception $exception) {
             return ShopResponse::getErrorResponse($exception, $request);
@@ -102,7 +126,14 @@ class UsersController extends Controller implements CrudControllerImplementation
 
     function deleteById(Request $request, Response $response)
     {
-        // TODO: Implement deleteById() method.
+        try {
+            $userService = new UserService();
+            $userService->deleteById($request);
+            return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "Data Deleted Successfully", true, null, $request);
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
     }
 
     function deleteAll(Request $request, Response $response)

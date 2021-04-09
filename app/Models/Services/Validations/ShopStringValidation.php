@@ -6,6 +6,10 @@ use App\Exceptions\BadInformationException;
 
 class ShopStringValidation {
 
+    static function isEnglishRequired($language) {
+        return self::isStringsEquals($language, "en");
+    }
+
     /**
      * @param $targetString
      * @param $errorMessage

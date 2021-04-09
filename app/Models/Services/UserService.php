@@ -212,13 +212,49 @@ class UserService implements ShopBaseServiceImplementation
         }
 
         $hashedPassword = $userQuery->value(User::$PASSWORD);
+        $isAccountAllowed =  $userQuery->value(User::$IS_ENABLED) && $userQuery->value(User::$IS_ACCOUNT_ACTIVATED);
         $userId = $userQuery->value(User::$ACCOUNT_ID);
         ShopStringValidation::validateEmptyString($hashedPassword, "Hashed Password Can't By Empty");
-        if (Hash::check($password, $hashedPassword)) {
+        if (Hash::check($password, $hashedPassword) && $isAccountAllowed) {
             return $this->getEntityById($userId)->first();
         } else {
             throw new BadInformationException("Incorrect Email Or Password Please Try Again");
         }
+    }
+
+    /**
+     * @param $email
+     * @throws BadInformationException
+     */
+    function getSecurityQuestionByEmailAddress($email) {
+        ShopStringValidation::validateEmptyString($email, "Email Required Can't Be Empty");
+        $userQuery = self::getAccountByUserEmail($email);
+        $user = $userQuery->first();
+        if ($user == null) {
+            throw new BadInformationException("User Not Found By Email Please Try Again");
+        }
+
+        $securityQuestion = $userQuery->value(User::$SECURITY_QUESTION);
+        ShopStringValidation::validateEmptyString($securityQuestion, "Security Question Null");
+        return $securityQuestion;
+    }
+
+    /**
+     * @param $email
+     * @param $answer
+     * @throws BadInformationException
+     */
+    function verifyBySecurityQuestion($email, $answer) {
+        ShopStringValidation::validateEmptyString($email, "Email Required Can't Be Empty");
+        ShopStringValidation::validateEmptyString($answer, "Security Answer Required Can't Be Empty");
+        $userQuery = self::getAccountByUserEmail($email);
+        $user = $userQuery->first();
+        if ($user == null) {
+            throw new BadInformationException("User Not Found By Email Please Try Again");
+        }
+
+        $securityAnswer = $userQuery->value(User::$SECURITY_QUESTION_ANSWER);
+        return ShopStringValidation::isStringsEquals($securityAnswer, $answer);
     }
 
     function getAccountByUserEmail($email) {
@@ -251,9 +287,22 @@ class UserService implements ShopBaseServiceImplementation
             ->get();
     }
 
+    /**
+     * @param Request $request
+     * @throws BadInformationException
+     */
     function deleteById(Request $request)
     {
-        // TODO: Implement deleteById() method.
+        $userId = $request->input(GeneralApiKeys::$USER_ID);
+        ShopStringValidation::validateEmptyString($userId, "User Id Required Can't Be Null");
+        $user = $this->getEntityById($userId);
+        if ($user == null) {
+            throw new BadInformationException("User Not Found By Id");
+        }
+
+        DB::table(User::$TABLE_NAME)
+            ->where(User::$ACCOUNT_ID, $userId)
+            ->delete();
     }
 
     function deleteAll(Request $request)
