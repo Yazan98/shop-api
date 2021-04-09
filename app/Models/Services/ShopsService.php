@@ -5,15 +5,15 @@ namespace App\Models\Services;
 
 use App\Exceptions\BadInformationException;
 use App\Models\GeneralApiKeys;
+use App\Models\Services\ShopBaseServiceImplementation;
 use App\Models\Services\Validations\ShopStringValidation;
 use App\Models\Shop;
 use App\Models\ShopMenu;
+use App\Models\ShopMenuItem;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-
-include('ShopBaseServiceImplementation.php');
 
 class ShopsService implements ShopBaseServiceImplementation
 {
@@ -92,6 +92,42 @@ class ShopsService implements ShopBaseServiceImplementation
             Shop::$CREATED_BY => $userIdCreated,
             Shop::$CREATED_AT => Carbon::now(),
         ));
+    }
+
+    /**
+     * @param $shopId
+     * @return array
+     * @throws BadInformationException
+     */
+    function getShopMenuItems($shopId) {
+        ShopStringValidation::validateEmptyString($shopId, "Shop Id Required");
+        $shopInfo = self::getEntityById($shopId);
+        if ($shopInfo == null) {
+            throw new BadInformationException("Invalid Shop Id");
+        }
+
+        $connectedMenuItemsResult = array();
+        $shopMenus = self::getShopMenuQueryNyShopId($shopId);
+        $menus = $shopMenus->get()->toArray();
+        $menusIds = $shopMenus->pluck('id')->toArray();
+        if ($menus == null) {
+            return array();
+        }
+
+        $itemsService = new ShopItemService();
+        foreach ($menus as $key => $value) {
+            $shopMenuItem = new ShopMenuItem();
+            $shopMenuItem->setMenu($value);
+            $shopMenuItem->setItems($itemsService->getItemsByMenuId($menusIds[$key]));
+            $connectedMenuItemsResult[] = $shopMenuItem;
+        }
+
+        return $connectedMenuItemsResult;
+    }
+
+    private function getShopMenuQueryNyShopId($id) {
+        return DB::table(ShopMenu::$TABLE_NAME)
+            ->where(ShopMenu::$SHOP_ID, $id);
     }
 
     /**
@@ -202,7 +238,14 @@ class ShopsService implements ShopBaseServiceImplementation
     {
         return DB::table(Shop::$TABLE_NAME)
             ->select(Shop::getSupportedEnglishValuesByQuery())
-            ->where('id', $id)
+            ->where(Shop::$ID, $id)
+            ->lockForUpdate()
+            ->get();
+    }
+
+    function getShopMenuEntityById($id) {
+        return DB::table(ShopMenu::$TABLE_NAME)
+            ->where(ShopMenu::$ID, $id)
             ->lockForUpdate()
             ->get();
     }

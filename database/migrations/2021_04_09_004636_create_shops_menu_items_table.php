@@ -19,7 +19,8 @@ class CreateShopsMenuItemsTable extends Migration
             $table->string('nameEn');
             $table->string('image');
             $table->double('price');
-            $table->double('description');
+            $table->string('descriptionAr', 300);
+            $table->string('descriptionEn', 300);
             $table->string('supported_sizes');
             $table->string('supported_colors', 200);
             $table->integer('menu_id');

@@ -16,4 +16,8 @@ class ShopMenu
     public static $NAME_AR = "nameAr";
     public static $NAME_EN = "nameEn";
     public static $SHOP_ID = "shop_id";
+
+    static function getShopMenuItemObject($menu, $items) {
+
+    }
 }
