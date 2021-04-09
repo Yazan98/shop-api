@@ -7,6 +7,7 @@ use App\Exceptions\BadInformationException;
 use App\Models\GeneralApiKeys;
 use App\Models\Services\Validations\ShopStringValidation;
 use App\Models\Shop;
+use App\Models\ShopMenu;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -91,6 +92,54 @@ class ShopsService implements ShopBaseServiceImplementation
             Shop::$CREATED_BY => $userIdCreated,
             Shop::$CREATED_AT => Carbon::now(),
         ));
+    }
+
+    /**
+     * @param Request $request
+     * @throws BadInformationException
+     */
+    function createShopMenu(Request $request) {
+        $nameAr = $request->input(ShopMenu::$NAME_AR);
+        $nameEn = $request->input(ShopMenu::$NAME_EN);
+        $shopId = $request->input(ShopMenu::$SHOP_ID);
+
+        ShopStringValidation::validateEmptyString($nameAr, "Arabic Name Required");
+        ShopStringValidation::validateEmptyString($nameEn, "English Name Required");
+        ShopStringValidation::validateEmptyString($shopId, "Shop Id Required");
+
+        $insertedMenu = DB::table(ShopMenu::$TABLE_NAME)->insertGetId(array(
+            Shop::$NAME_AR => $nameAr,
+            Shop::$NAME_EN => $nameEn,
+            Shop::$IS_ENABLED => true,
+            ShopMenu::$SHOP_ID => $shopId,
+            Shop::$CREATED_AT => Carbon::now(),
+        ));
+
+        return DB::table(ShopMenu::$TABLE_NAME)
+            ->where(ShopMenu::$ID, $insertedMenu)
+            ->first();
+    }
+
+    /**
+     * @param $id
+     * @throws BadInformationException
+     */
+    function getAllMenusByShopId($id) {
+        ShopStringValidation::validateEmptyString($id, "Shop Id Required");
+        return DB::table(ShopMenu::$TABLE_NAME)
+            ->where(ShopMenu::$SHOP_ID, $id)
+            ->get();
+    }
+
+    /**
+     * @param $id
+     * @throws BadInformationException
+     */
+    function deleteMenuByShopId($id) {
+        ShopStringValidation::validateEmptyString($id, "Shop Id Required");
+        DB::table(ShopMenu::$TABLE_NAME)
+            ->where(ShopMenu::$SHOP_ID, $id)
+            ->delete();
     }
 
     function isUserHasShopAlready($id)

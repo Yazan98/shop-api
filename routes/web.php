@@ -36,12 +36,15 @@ Route::post(RouterPaths::getFullRequestPath(RouterPaths::$VERIFY_SECURITY_ANSWER
 
 // Shops Controller
 Route::post(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_CREATE_USERS_PATH), [ShopsController::class, RouterPaths::$CREATE_ENTITY_NAME]);
+Route::post(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_MENU_MAIN_PATH), [ShopsController::class, RouterPaths::$CREATE_MENU_NAME]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_GET_ALL_USERS_PATH), [ShopsController::class, RouterPaths::$GET_ALL_ENTITIES_NAME]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_GET_ALL_ENABLED_PATH), [ShopsController::class, RouterPaths::$GET_ALL_ENABLED]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_GET_ALL_DISABLED_PATH), [ShopsController::class, RouterPaths::$GET_ALL_DISABLED]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_GET_BY_ID_PATH), [ShopsController::class, RouterPaths::$GET_BY_ID]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_MENU_MAIN_PATH), [ShopsController::class, RouterPaths::$GET_ALL_MENUES_SHOP]);
 Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_DELETE_ALL_PATH), [ShopsController::class, RouterPaths::$DELETE_ALL]);
 Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_DELETE_BY_ID_PATH), [ShopsController::class, RouterPaths::$DELETE_BY_ID]);
+Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_MENU_MAIN_PATH), [ShopsController::class, RouterPaths::$DELETE_MENU_BY_SHOP_ID]);
 
 // Categories Controller
 Route::post(RouterPaths::getFullRequestPath(RouterPaths::$CATEGORY_CREATE_USERS_PATH), [CategoryController::class, RouterPaths::$CREATE_ENTITY_NAME]);
@@ -72,6 +75,7 @@ class RouterPaths
     public static $SHOP_CREATE_USERS_PATH = "/shops/";
     public static $SHOP_GET_ALL_USERS_PATH = "/shops";
     public static $SHOP_GET_BY_ID_PATH = "/shops/{id}";
+    public static $SHOP_MENU_MAIN_PATH = "/shops/{id}/menu";
     public static $SHOP_DELETE_ALL_PATH = "/shops";
     public static $SHOP_DELETE_BY_ID_PATH = "/shops";
     public static $SHOP_GET_ALL_ENABLED_PATH = "/shops/enabled";
@@ -99,6 +103,9 @@ class RouterPaths
     public static $SECURITY_QUESTION = "getSecurityQuestionByEmailAddress";
     public static $VERIFY_SECURITY_ANSWER = "verifyBySecurityQuestion";
     public static $DELETE_BY_ID = "deleteById";
+    public static $CREATE_MENU_NAME = "createShopMenu";
+    public static $GET_ALL_MENUES_SHOP = "getAllMenusByShopId";
+    public static $DELETE_MENU_BY_SHOP_ID = "deleteMenuByShopId";
 
     public static function getFullRequestPath($request)
     {

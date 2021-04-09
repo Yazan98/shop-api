@@ -26,6 +26,36 @@ class ShopsController extends Controller implements CrudControllerImplementation
         }
     }
 
+    function createShopMenu(Request $request) {
+        try {
+            $service = new ShopsService();
+            $currentUserId = $service->createShopMenu($request);
+            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $currentUserId, $request);
+        } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
+    function getAllMenusByShopId(Request $request, $id) {
+        try {
+            $service = new ShopsService();
+            $currentUserId = $service->getAllMenusByShopId($id);
+            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $currentUserId, $request);
+        } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
+    function deleteMenuByShopId(Request $request, $id) {
+        try {
+            $service = new ShopsService();
+            $service->deleteMenuByShopId($id);
+            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "Data Successfully Deleted", true, null, $request);
+        } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
     function getAll(Request $request, Response $response)
     {
         try {
