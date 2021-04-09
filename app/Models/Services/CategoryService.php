@@ -5,6 +5,7 @@ namespace App\Models\Services;
 
 
 use App\Exceptions\BadInformationException;
+use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\GeneralApiKeys;
 use App\Models\Services\Validations\ShopStringValidation;
@@ -42,10 +43,10 @@ class CategoryService implements ShopBaseServiceImplementation
         ));
     }
 
-    function getAll(Request $request)
+    function getAll(Request $request, $language)
     {
         return DB::table(Category::$TABLE_NAME)
-            ->select(Category::getSupportedEnglishValuesByQuery())
+            ->select(Category::getSupportedValuesByQuery($language))
             ->get();
     }
 
@@ -72,27 +73,39 @@ class CategoryService implements ShopBaseServiceImplementation
         DB::table(Category::$TABLE_NAME)->truncate();
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Support\Collection
+     * @throws BadInformationException
+     */
     function getAllEnabledEntities(Request $request)
     {
+        $language = Controller::getLanguageHeader($request);
         return DB::table(Category::$TABLE_NAME)
             ->where(Category::$IS_ENABLED, true)
-            ->select(Category::getSupportedEnglishValuesByQuery())
+            ->select(Category::getSupportedValuesByQuery($language))
             ->get();
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Support\Collection
+     * @throws BadInformationException
+     */
     function getAllDisabledEntities(Request $request)
     {
+        $language = Controller::getLanguageHeader($request);
         return DB::table(Category::$TABLE_NAME)
             ->where(Category::$IS_ENABLED, false)
-            ->select(Category::getSupportedEnglishValuesByQuery())
+            ->select(Category::getSupportedValuesByQuery($language))
             ->get();
     }
 
     function getEntityById($id)
     {
         return DB::table(Category::$TABLE_NAME)
-            ->select(Category::getSupportedEnglishValuesByQuery())
-            ->where('id', $id)
+            ->select(Category::getSupportedValuesByQuery("en"))
+            ->where(Category::$ID, $id)
             ->lockForUpdate()
             ->get();
     }

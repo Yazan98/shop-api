@@ -11,4 +11,7 @@ class GeneralApiKeys
     public static $EMAIL_KEY = "email";
     public static $PASSWORD_KEY = "password";
     public static $SECURITY_ANSWER = "securityQuestion";
+    public static $DEFAULT_LANGUAGE = "en";
+    public static $ARABIC_LANGUAGE = "ar";
+    public static $ACCEPT_LANGUAGE = "Accept-Language";
 }

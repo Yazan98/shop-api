@@ -90,10 +90,10 @@ class ShopItemService implements ShopBaseServiceImplementation
             ->get();
     }
 
-    function getAll(Request $request)
+    function getAll(Request $request, $language)
     {
         return DB::table(ShopItem::$TABLE_NAME)
-            ->select(ShopItem::getVisibleAttributes())
+            ->select(ShopItem::getVisibleAttributes($language))
             ->get();
     }
 
@@ -124,7 +124,7 @@ class ShopItemService implements ShopBaseServiceImplementation
     {
         return DB::table(ShopItem::$TABLE_NAME)
             ->where(ShopItem::$IS_ENABLED, true)
-            ->select(ShopItem::getVisibleAttributes())
+            ->select(ShopItem::getVisibleAttributes("en"))
             ->get();
     }
 
@@ -132,14 +132,14 @@ class ShopItemService implements ShopBaseServiceImplementation
     {
         return DB::table(ShopItem::$TABLE_NAME)
             ->where(ShopItem::$IS_ENABLED, false)
-            ->select(ShopItem::getVisibleAttributes())
+            ->select(ShopItem::getVisibleAttributes("en"))
             ->get();
     }
 
     function getEntityById($id)
     {
         return DB::table(ShopItem::$TABLE_NAME)
-            ->select(ShopItem::getVisibleAttributes())
+            ->select(ShopItem::getVisibleAttributes("en"))
             ->where(ShopItem::$ID, $id)
             ->lockForUpdate()
             ->get();

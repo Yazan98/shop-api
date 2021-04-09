@@ -4,6 +4,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\ShopsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemsController;
+use App\Http\Controllers\ShopBranchesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,6 +68,14 @@ Route::get(RouterPaths::getFullRequestPath(RouterPaths::$ITEM_GET_BY_ID_PATH), [
 Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$ITEM_DELETE_ALL_PATH), [ItemsController::class, RouterPaths::$DELETE_ALL]);
 Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$ITEM_DELETE_BY_ID_PATH), [ItemsController::class, RouterPaths::$DELETE_BY_ID]);
 
+// Shop Branches Controller
+Route::post(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_BRANCH_CREATE_USERS_PATH), [ShopBranchesController::class, RouterPaths::$CREATE_ENTITY_NAME]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_BRANCH_GET_ALL_USERS_PATH), [ShopBranchesController::class, RouterPaths::$GET_ALL_ENTITIES_NAME]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_BRANCH_GET_ALL_ENABLED_PATH), [ShopBranchesController::class, RouterPaths::$GET_ALL_ENABLED]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_BRANCH_GET_ALL_DISABLED_PATH), [ShopBranchesController::class, RouterPaths::$GET_ALL_DISABLED]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_BRANCH_GET_BY_ID_PATH), [ShopBranchesController::class, RouterPaths::$GET_BY_ID]);
+Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_BRANCH_DELETE_ALL_PATH), [ShopBranchesController::class, RouterPaths::$DELETE_ALL]);
+Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_BRANCH_DELETE_BY_ID_PATH), [ShopBranchesController::class, RouterPaths::$DELETE_BY_ID]);
 
 class RouterPaths
 {
@@ -113,6 +122,15 @@ class RouterPaths
     public static $ITEM_DELETE_BY_ID_PATH = "/items";
     public static $ITEM_GET_ALL_ENABLED_PATH = "/items/enabled";
     public static $ITEM_GET_ALL_DISABLED_PATH = "/items/disabled";
+
+    // Shop Branches Controller
+    public static $SHOP_BRANCH_CREATE_USERS_PATH = "/shops/branches/";
+    public static $SHOP_BRANCH_GET_ALL_USERS_PATH = "/shops/branches";
+    public static $SHOP_BRANCH_GET_BY_ID_PATH = "/shops/branches/{id}";
+    public static $SHOP_BRANCH_DELETE_ALL_PATH = "/shops/branches";
+    public static $SHOP_BRANCH_DELETE_BY_ID_PATH = "/shops/branches";
+    public static $SHOP_BRANCH_GET_ALL_ENABLED_PATH = "/shops/branches/enabled";
+    public static $SHOP_BRANCH_GET_ALL_DISABLED_PATH = "/shops/branches/disabled";
 
     // Common Controller Methods
     public static $CREATE_ENTITY_NAME = "saveEntity";

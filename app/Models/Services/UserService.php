@@ -280,7 +280,7 @@ class UserService implements ShopBaseServiceImplementation
         return $userExists != null && count($userExists) > 0;
     }
 
-    function getAll(Request $request)
+    function getAll(Request $request, $language)
     {
         return DB::table(User::$TABLE_NAME)
             ->select(User::getVisibleResponseAttributes())

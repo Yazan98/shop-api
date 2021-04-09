@@ -4,6 +4,7 @@
 namespace App\Models;
 
 
+use App\Models\Services\Validations\ShopStringValidation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 
@@ -27,13 +28,40 @@ class ShopItem
     public static $CREATED_AT = "created_at";
     public static $ID = "id";
 
-    static function getVisibleAttributes() {
+    static function getVisibleAttributes($language) {
+        if (ShopStringValidation::isEnglishRequired($language)) {
+            return self::getSupportedEnglishValuesByQuery();
+        } else {
+            return self::getSupportedArabicValuesByQuery();
+        }
+    }
+
+    private static function getSupportedEnglishValuesByQuery()
+    {
         return [
             ShopItem::$ID,
             ShopItem::$NAME_EN,
             ShopItem::$IMAGE,
             ShopItem::$PRICE,
             ShopItem::$DESCRIPTION_EN,
+            ShopItem::$SUPPORTED_SIZES,
+            ShopItem::$SUPPORTED_COLORS,
+            ShopItem::$MENU_ID,
+            ShopItem::$IS_AVAILABLE,
+            ShopItem::$IS_ENABLED,
+            ShopItem::$COMMENTS,
+            ShopItem::$CREATED_AT,
+        ];
+    }
+
+    private static function getSupportedArabicValuesByQuery()
+    {
+        return [
+            ShopItem::$ID,
+            ShopItem::$NAME_AR,
+            ShopItem::$IMAGE,
+            ShopItem::$PRICE,
+            ShopItem::$DESCRIPTION_AR,
             ShopItem::$SUPPORTED_SIZES,
             ShopItem::$SUPPORTED_COLORS,
             ShopItem::$MENU_ID,

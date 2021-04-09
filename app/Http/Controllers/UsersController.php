@@ -71,8 +71,9 @@ class UsersController extends Controller implements CrudControllerImplementation
     function getAll(Request $request, Response $response)
     {
         try {
+            $language = self::getLanguageHeader($request);
             $service = new UserService();
-            $users = $service->getAll($request);
+            $users = $service->getAll($request, $language);
             if ($users != null) {
                 return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $users, $request);
             } else {

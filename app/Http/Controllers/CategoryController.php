@@ -12,7 +12,7 @@ use Illuminate\Http\Response;
 
 include("CrudControllerImplementation.php");
 
-class CategoryController implements CrudControllerImplementation
+class CategoryController extends Controller implements CrudControllerImplementation
 {
 
     function saveEntity(Request $request, Response $response)
@@ -30,8 +30,9 @@ class CategoryController implements CrudControllerImplementation
     function getAll(Request $request, Response $response)
     {
         try {
+            $language = $this->getLanguageHeader($request);
             $service = new CategoryService();
-            $users = $service->getAll($request);
+            $users = $service->getAll($request, $language);
             if ($users != null) {
                 return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $users, $request);
             } else {

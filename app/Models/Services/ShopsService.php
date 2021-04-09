@@ -109,7 +109,7 @@ class ShopsService implements ShopBaseServiceImplementation
         $connectedMenuItemsResult = array();
         $shopMenus = self::getShopMenuQueryNyShopId($shopId);
         $menus = $shopMenus->get()->toArray();
-        $menusIds = $shopMenus->pluck('id')->toArray();
+        $menusIds = $shopMenus->pluck(ShopMenu::$ID)->toArray();
         if ($menus == null) {
             return array();
         }
@@ -188,10 +188,10 @@ class ShopsService implements ShopBaseServiceImplementation
         return $userExists != null && count($userExists) > 0;
     }
 
-    function getAll(Request $request)
+    function getAll(Request $request, $language)
     {
         return DB::table(Shop::$TABLE_NAME)
-            ->select(Shop::getSupportedEnglishValuesByQuery())
+            ->select(Shop::getSupportedValuesByQuery($language))
             ->get();
     }
 

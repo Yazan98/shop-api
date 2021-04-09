@@ -8,7 +8,7 @@ interface ShopBaseServiceImplementation {
 
     function saveEntity(Request $request);
 
-    function getAll(Request $request);
+    function getAll(Request $request, $language);
 
     function deleteById(Request $request);
 
