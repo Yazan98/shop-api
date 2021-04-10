@@ -125,6 +125,23 @@ class ShopsService implements ShopBaseServiceImplementation
         return $connectedMenuItemsResult;
     }
 
+    function searchShops($query, $language)
+    {
+        $isEnglish = ShopStringValidation::isStringsEquals($language, GeneralApiKeys::$DEFAULT_LANGUAGE);
+        $queryBuilder = DB::table(Shop::$TABLE_NAME)->limit(30)->select(Shop::getSupportedValuesByQuery($language));
+        if ($isEnglish) {
+            return $queryBuilder
+                ->orWhere(Shop::$NAME_EN, 'LIKE', '%' . $query . '%')
+                ->orWhere(Shop::$DESCRIPTION_EN, 'LIKE', '%' . $query . '%')
+                ->get();
+        } else {
+            return $queryBuilder
+                ->where(Shop::$NAME_AR, 'LIKE', '%' . $query . '%')
+                ->orWhere(Shop::$DESCRIPTION_AR, 'LIKE', '%' . $query . '%')
+                ->get();
+        }
+    }
+
     private function getShopMenuQueryNyShopId($id) {
         return DB::table(ShopMenu::$TABLE_NAME)
             ->where(ShopMenu::$SHOP_ID, $id);

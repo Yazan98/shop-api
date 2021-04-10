@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuthResponse;
 use App\Models\GeneralApiKeys;
 use App\Models\Services\UserService;
 use App\Models\ShopResponse;
@@ -38,7 +39,9 @@ class UsersController extends Controller implements CrudControllerImplementation
             $userEmail = $request->input(GeneralApiKeys::$EMAIL_KEY);
             $userPassword = $request->input(GeneralApiKeys::$PASSWORD_KEY);
             $targetUser = $userService->loginAccount($userEmail, $userPassword);
-            return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $targetUser, $request);
+            $tokenCredentials = $request->only(GeneralApiKeys::$EMAIL_KEY, GeneralApiKeys::$PASSWORD_KEY);
+            $token = auth(GeneralApiKeys::$TOKEN_GUARD)->attempt($tokenCredentials);
+            return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, new AuthResponse($targetUser, $token, "Bearer"), $request);
         } catch (\Exception $exception) {
             return ShopResponse::getErrorResponse($exception, $request);
         }

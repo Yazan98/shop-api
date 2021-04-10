@@ -11,7 +11,6 @@ class PhoneNumber
 {
     use HasFactory, Notifiable;
     public static $TABLE_NAME = "phone_numbers";
-    public static $USER_NOT_INSERTED = -1;
 
     public static $CODE = "code";
     public static $USER_ID = "user_id";

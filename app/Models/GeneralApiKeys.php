@@ -14,4 +14,6 @@ class GeneralApiKeys
     public static $DEFAULT_LANGUAGE = "en";
     public static $ARABIC_LANGUAGE = "ar";
     public static $ACCEPT_LANGUAGE = "Accept-Language";
+    public static $TOKEN_GUARD = "api";
+    public static $SEARCH_QUERY_KEY = "query";
 }

@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\GeneralApiKeys;
 use App\Models\Services\ShopItemService;
 use App\Models\ShopResponse;
 use CrudControllerImplementation;
@@ -22,6 +23,23 @@ class ItemsController  extends Controller implements CrudControllerImplementatio
             $newInsertedUser = $service->getEntityById($currentUserId)->first();
             return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $newInsertedUser, $request);
         } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
+    function searchItems(Request $request) {
+        try {
+            $language = $this->getLanguageHeader($request);
+            $searchQuery = $request->query(GeneralApiKeys::$SEARCH_QUERY_KEY);
+            $service = new ShopItemService();
+            $users = $service->searchItems($searchQuery, $language);
+            if ($users != null) {
+                return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $users, $request);
+            } else {
+                return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
+            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
             return ShopResponse::getErrorResponse($exception, $request);
         }
     }

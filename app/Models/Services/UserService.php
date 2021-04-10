@@ -102,6 +102,11 @@ class UserService implements ShopBaseServiceImplementation
         }
     }
 
+    public function getProfileEmailQuery($email) {
+        return DB::table(User::$TABLE_NAME)
+            ->where(User::$EMAIL, $email);
+    }
+
     /**
      * @param $id
      * @param $verificationCode
@@ -215,7 +220,11 @@ class UserService implements ShopBaseServiceImplementation
         $isAccountAllowed =  $userQuery->value(User::$IS_ENABLED) && $userQuery->value(User::$IS_ACCOUNT_ACTIVATED);
         $userId = $userQuery->value(User::$ACCOUNT_ID);
         ShopStringValidation::validateEmptyString($hashedPassword, "Hashed Password Can't By Empty");
-        if (Hash::check($password, $hashedPassword) && $isAccountAllowed) {
+        if (!$isAccountAllowed) {
+            throw new BadInformationException("Account Not Verified, Please Verify The Phone Number");
+        }
+
+        if (Hash::check($password, $hashedPassword)) {
             return $this->getEntityById($userId)->first();
         } else {
             throw new BadInformationException("Incorrect Email Or Password Please Try Again");

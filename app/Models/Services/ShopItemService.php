@@ -9,8 +9,6 @@ use App\Models\GeneralApiKeys;
 use App\Models\Services\Validations\ShopStringValidation;
 use App\Models\Shop;
 use App\Models\ShopItem;
-use App\Models\ShopMenu;
-use App\Models\ShopMenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -76,16 +74,18 @@ class ShopItemService implements ShopBaseServiceImplementation
         ));
     }
 
-    function getItemsByShopId($shopId) {
+    function getItemsByShopId($shopId)
+    {
         return DB::table(ShopItem::$TABLE_NAME)
-            ->select(ShopItem::getVisibleAttributes())
+            ->select(ShopItem::getVisibleAttributes("en"))
             ->where(ShopItem::$SHOP_ID, $shopId)
             ->get();
     }
 
-    function getItemsByMenuId($id) {
+    function getItemsByMenuId($id)
+    {
         return DB::table(ShopItem::$TABLE_NAME)
-            ->select(ShopItem::getVisibleAttributes())
+            ->select(ShopItem::getVisibleAttributes("en"))
             ->where(ShopItem::$MENU_ID, $id)
             ->get();
     }
@@ -95,6 +95,23 @@ class ShopItemService implements ShopBaseServiceImplementation
         return DB::table(ShopItem::$TABLE_NAME)
             ->select(ShopItem::getVisibleAttributes($language))
             ->get();
+    }
+
+    function searchItems($query, $language)
+    {
+        $isEnglish = ShopStringValidation::isStringsEquals($language, GeneralApiKeys::$DEFAULT_LANGUAGE);
+        $queryBuilder = DB::table(ShopItem::$TABLE_NAME)->limit(30)->select(ShopItem::getVisibleAttributes($language));
+        if ($isEnglish) {
+            return $queryBuilder
+                ->orWhere(ShopItem::$NAME_EN, 'LIKE', '%' . $query . '%')
+                ->orWhere(ShopItem::$DESCRIPTION_EN, 'LIKE', '%' . $query . '%')
+                ->get();
+        } else {
+            return $queryBuilder
+                ->where(ShopItem::$NAME_AR, 'LIKE', '%' . $query . '%')
+                ->orWhere(ShopItem::$DESCRIPTION_AR, 'LIKE', '%' . $query . '%')
+                ->get();
+        }
     }
 
     /**

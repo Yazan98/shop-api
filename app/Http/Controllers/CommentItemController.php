@@ -3,23 +3,22 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\GeneralApiKeys;
-use App\Models\Services\ShopItemService;
-use App\Models\Services\ShopsService;
+use App\Models\Services\ItemCommentService;
+use App\Models\Services\UserAddressService;
 use App\Models\ShopResponse;
 use CrudControllerImplementation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-include("CrudControllerImplementation.php");
-
-class ShopsController extends Controller implements CrudControllerImplementation
+class CommentItemController extends Controller implements CrudControllerImplementation
 {
 
     function saveEntity(Request $request, Response $response)
     {
         try {
-            $service = new ShopsService();
+            $service = new ItemCommentService();
             $currentUserId = $service->saveEntity($request);
             $newInsertedUser = $service->getEntityById($currentUserId)->first();
             return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $newInsertedUser, $request);
@@ -28,12 +27,10 @@ class ShopsController extends Controller implements CrudControllerImplementation
         }
     }
 
-    function searchShops(Request $request) {
+    function getCommentsByItemId(Request $request) {
         try {
-            $language = $this->getLanguageHeader($request);
-            $searchQuery = $request->query(GeneralApiKeys::$SEARCH_QUERY_KEY);
-            $service = new ShopsService();
-            $users = $service->searchShops($searchQuery, $language);
+            $service = new ItemCommentService();
+            $users = $service->getCommentsByItemId($request->query(GeneralApiKeys::$USER_ID));
             if ($users != null) {
                 return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $users, $request);
             } else {
@@ -45,61 +42,11 @@ class ShopsController extends Controller implements CrudControllerImplementation
         }
     }
 
-    function getShopItemsByShopId(Request $request, $id) {
-        try {
-            $service = new ShopItemService();
-            $currentUserId = $service->getItemsByShopId($id);
-            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $currentUserId, $request);
-        } catch (\Exception $exception) {
-            return ShopResponse::getErrorResponse($exception, $request);
-        }
-    }
-
-    function getMenuItemsInformation(Request $request, $id) {
-        try {
-            $service = new ShopsService();
-            $currentUserId = $service->getShopMenuItems($id);
-            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $currentUserId, $request);
-        } catch (\Exception $exception) {
-            return ShopResponse::getErrorResponse($exception, $request);
-        }
-    }
-
-    function createShopMenu(Request $request) {
-        try {
-            $service = new ShopsService();
-            $currentUserId = $service->createShopMenu($request);
-            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $currentUserId, $request);
-        } catch (\Exception $exception) {
-            return ShopResponse::getErrorResponse($exception, $request);
-        }
-    }
-
-    function getAllMenusByShopId(Request $request, $id) {
-        try {
-            $service = new ShopsService();
-            $currentUserId = $service->getAllMenusByShopId($id);
-            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "", true, $currentUserId, $request);
-        } catch (\Exception $exception) {
-            return ShopResponse::getErrorResponse($exception, $request);
-        }
-    }
-
-    function deleteMenuByShopId(Request $request, $id) {
-        try {
-            $service = new ShopsService();
-            $service->deleteMenuByShopId($id);
-            return ShopResponse::getSuccessResponse(ShopResponse::$DATA_CREATED_SUCCESS_RESPONSE, "Data Successfully Deleted", true, null, $request);
-        } catch (\Exception $exception) {
-            return ShopResponse::getErrorResponse($exception, $request);
-        }
-    }
-
     function getAll(Request $request, Response $response)
     {
         try {
             $language = $this->getLanguageHeader($request);
-            $service = new ShopsService();
+            $service = new ItemCommentService();
             $users = $service->getAll($request, $language);
             if ($users != null) {
                 return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $users, $request);
@@ -115,7 +62,7 @@ class ShopsController extends Controller implements CrudControllerImplementation
     function getById(Request $request, Response $response, $id)
     {
         try {
-            $user = new ShopsService();
+            $user = new UserAddressService();
             $currentUser = $user->getEntityById($id)->first();
             if ($user != null) {
                 return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $currentUser, $request);
@@ -131,7 +78,7 @@ class ShopsController extends Controller implements CrudControllerImplementation
     function deleteById(Request $request, Response $response)
     {
         try {
-            $userService = new ShopsService();
+            $userService = new UserAddressService();
             $userService->deleteById($request);
             return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "Data Deleted Successfully", true, null, $request);
         } catch (\Exception $exception) {
@@ -142,7 +89,7 @@ class ShopsController extends Controller implements CrudControllerImplementation
 
     function deleteAll(Request $request, Response $response)
     {
-        $userService = new ShopsService();
+        $userService = new UserAddressService();
         $userService->deleteAll($request);
         return ShopResponse::getSuccessResponse(ShopResponse::$SUCCESS_RESPONSE, "Data Deleted Successfully", true, [], $request);
     }
@@ -150,7 +97,7 @@ class ShopsController extends Controller implements CrudControllerImplementation
     function getAllEnabledEntities(Request $request, Response $response)
     {
         try {
-            $userService = new ShopsService();
+            $userService = new UserAddressService();
             $allUsers = $userService->getAllEnabledEntities($request);
             if ($allUsers != null) {
                 return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $allUsers, $request);
@@ -165,7 +112,7 @@ class ShopsController extends Controller implements CrudControllerImplementation
     function getAllDisabledEntities(Request $request, Response $response)
     {
         try {
-            $userService = new ShopsService();
+            $userService = new UserAddressService();
             $allUsers = $userService->getAllDisabledEntities($request);
             if ($allUsers != null) {
                 return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $allUsers, $request);
@@ -181,4 +128,5 @@ class ShopsController extends Controller implements CrudControllerImplementation
     {
         // TODO: Implement getAllEnabledDisabledEntities() method.
     }
+
 }
