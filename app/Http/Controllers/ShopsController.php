@@ -75,6 +75,20 @@ class ShopsController extends Controller implements CrudControllerImplementation
         }
     }
 
+    function getLastInsertedShops(Request $request) {
+        try {
+            $service = new ShopsService();
+            $currentUserId = $service->getLastInsertedShops();
+            if ($currentUserId != null) {
+                return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $currentUserId, $request);
+            } else {
+                return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
+            }
+        } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
     function getAllMenusByShopId(Request $request, $id) {
         try {
             $service = new ShopsService();

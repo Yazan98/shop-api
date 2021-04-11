@@ -94,6 +94,13 @@ class ShopsService implements ShopBaseServiceImplementation
         ));
     }
 
+    function getLastInsertedShops() {
+        return DB::table(Shop::$TABLE_NAME)
+            ->orderBy(Shop::$ID, 'DESC')
+            ->limit(9)
+            ->get();
+    }
+
     /**
      * @param $shopId
      * @return array

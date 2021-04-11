@@ -70,8 +70,15 @@ class ShopItemService implements ShopBaseServiceImplementation
             ShopItem::$SHOP_ID => $shopId,
             ShopItem::$MENU_ID => $menuId,
             ShopItem::$IS_AVAILABLE => $isAvailable,
-            Shop::$CREATED_AT => Carbon::now(),
+            ShopItem::$CREATED_AT => Carbon::now(),
         ));
+    }
+
+    function getLastInsertedItems() {
+        return DB::table(ShopItem::$TABLE_NAME)
+            ->orderBy(ShopItem::$ID, 'DESC')
+            ->limit(9)
+            ->get();
     }
 
     function getItemsByShopId($shopId)

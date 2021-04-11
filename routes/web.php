@@ -40,6 +40,7 @@ Route::post(RouterPaths::getFullRequestPath(RouterPaths::$VERIFY_SECURITY_ANSWER
 
 // Shops Controller
 Route::post(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_CREATE_USERS_PATH), [ShopsController::class, RouterPaths::$CREATE_ENTITY_NAME]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$GET_LAST_ADDED_SHOPS_PATH), [ShopsController::class, RouterPaths::$GET_LAST_ADDED_SHOPS]);
 Route::post(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_MENU_MAIN_PATH), [ShopsController::class, RouterPaths::$CREATE_MENU_NAME]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_GET_ALL_USERS_PATH), [ShopsController::class, RouterPaths::$GET_ALL_ENTITIES_NAME]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$SHOP_GET_ITEMS_BY_SHOP_ID), [ShopsController::class, RouterPaths::$GET_SHOP_ITEMS_BY_SHOP_ID]);
@@ -65,6 +66,7 @@ Route::delete(RouterPaths::getFullRequestPath(RouterPaths::$CATEGORY_DELETE_BY_I
 // Items Controller
 Route::post(RouterPaths::getFullRequestPath(RouterPaths::$ITEM_CREATE_USERS_PATH), [ItemsController::class, RouterPaths::$CREATE_ENTITY_NAME]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$ITEM_GET_ALL_USERS_PATH), [ItemsController::class, RouterPaths::$GET_ALL_ENTITIES_NAME]);
+Route::get(RouterPaths::getFullRequestPath(RouterPaths::$GET_LAST_ADDED_ITEM_PATH), [ItemsController::class, RouterPaths::$GET_LAST_ADDED_Items]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$ITEM_GET_ALL_ENABLED_PATH), [ItemsController::class, RouterPaths::$GET_ALL_ENABLED]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$ITEM_GET_ALL_DISABLED_PATH), [ItemsController::class, RouterPaths::$GET_ALL_DISABLED]);
 Route::get(RouterPaths::getFullRequestPath(RouterPaths::$ITEM_GET_BY_ID_PATH), [ItemsController::class, RouterPaths::$GET_BY_ID]);
@@ -125,6 +127,7 @@ class RouterPaths
     public static $SHOP_GET_ITEMS_BY_SHOP_ID_ALL = "/shops/{id}/items/all";
     public static $SHOP_MENU_MAIN_PATH = "/shops/{id}/menu";
     public static $SHOP_SEARCH_SHOPS_PATH = "/shops/search";
+    public static $GET_LAST_ADDED_SHOPS_PATH = "/shops/latest";
     public static $SHOP_DELETE_ALL_PATH = "/shops";
     public static $SHOP_DELETE_BY_ID_PATH = "/shops";
     public static $SHOP_GET_ALL_ENABLED_PATH = "/shops/enabled";
@@ -144,6 +147,7 @@ class RouterPaths
     public static $ITEM_GET_ALL_USERS_PATH = "/items";
     public static $ITEM_GET_BY_ID_PATH = "/items/{id}";
     public static $ITEM_SEARCH_ITEMS_PATH = "/items/search";
+    public static $GET_LAST_ADDED_ITEM_PATH = "/items/latest";
     public static $ITEM_DELETE_ALL_PATH = "/items";
     public static $ITEM_DELETE_BY_ID_PATH = "/items";
     public static $ITEM_GET_ALL_ENABLED_PATH = "/items/enabled";
@@ -198,6 +202,8 @@ class RouterPaths
     public static $SEARCH_ITEMS_NAME = "searchItems";
     public static $SEARCH_SHOPS_NAME = "searchShops";
     public static $GET_COMMENTS_BY_ITEM_ID = "getCommentsByItemId";
+    public static $GET_LAST_ADDED_SHOPS = "getLastInsertedShops";
+    public static $GET_LAST_ADDED_Items = "getLastInsertedItems";
 
     public static function getFullRequestPath($request)
     {

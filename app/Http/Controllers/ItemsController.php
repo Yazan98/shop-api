@@ -44,6 +44,20 @@ class ItemsController  extends Controller implements CrudControllerImplementatio
         }
     }
 
+    function getLastInsertedItems(Request $request) {
+        try {
+            $service = new ShopItemService();
+            $currentUserId = $service->getLastInsertedItems();
+            if ($currentUserId != null) {
+                return ShopResponse::getListResponse(ShopResponse::$SUCCESS_RESPONSE, "", true, $currentUserId, $request);
+            } else {
+                return ShopResponse::getNotFoundResponse(ShopResponse::$SUCCESS_RESPONSE, $request);
+            }
+        } catch (\Exception $exception) {
+            return ShopResponse::getErrorResponse($exception, $request);
+        }
+    }
+
     function getAll(Request $request, Response $response)
     {
         try {

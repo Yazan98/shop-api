@@ -17,10 +17,10 @@ class CreateShopsTable extends Migration
             $table->id();
             $table->string('nameAr');
             $table->string('nameEn');
-            $table->string('shortDescriptionAr', 80);
-            $table->string('shortDescriptionEn', 80);
-            $table->string('descriptionAr', 200);
-            $table->string('descriptionEn', 200);
+            $table->string('shortDescriptionAr', 150);
+            $table->string('shortDescriptionEn', 150);
+            $table->string('descriptionAr', 250);
+            $table->string('descriptionEn', 250);
             $table->string('image', 250)->default("");
             $table->string('locationAr');
             $table->integer('created_by')->default(-1);

@@ -15,6 +15,7 @@ class VerifyCsrfToken extends Middleware
         'api/v1/users',
         'api/v1/categories',
         'api/v1/shops/*',
+        'api/v1/shops',
         'api/v1/items/*',
         'api/v1/items',
         'api/v1/users/otp/refresh',
