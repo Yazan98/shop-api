@@ -1,0 +1,33 @@
+# For more information: https://laravel.com/docs/sail
+version: '3'
+services:
+    admin:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - '8000:8000'
+#        depends_on:
+#            - mysql
+
+
+#    mysql:
+#        image: 'mysql:latest'
+#        ports:
+#            - '52000:3306'
+#        environment:
+#            MYSQL_ROOT_PASSWORD: 'Yazan98'
+#            MYSQL_DATABASE: 'shop_api'
+#            MYSQL_PASSWORD: 'Yazan98'
+#            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+#        volumes:
+#            - ./storage/dbdata:/var/lib/mysql
+#        healthcheck:
+#          test: ["CMD", "mysqladmin", "ping"]
+
+networks:
+    sail:
+        driver: bridge
+volumes:
+    sailmysql:
+        driver: local

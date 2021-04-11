@@ -35,6 +35,11 @@ return [
     */
 
     'channels' => [
+        'none' => [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],
