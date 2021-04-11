@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\BadInformationException;
 use App\Models\GeneralApiKeys;
+use App\Models\Services\Validations\ShopStringValidation;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -32,7 +33,6 @@ class Controller extends BaseController
     /**
      * @param Request $request
      * @return array|string
-     * @throws BadInformationException
      */
     static function getLanguageHeader(Request $request) {
         $language = $request->header(GeneralApiKeys::$ACCEPT_LANGUAGE);
@@ -47,7 +47,7 @@ class Controller extends BaseController
         if ((strcmp($language, GeneralApiKeys::$DEFAULT_LANGUAGE) == 0) || strcmp($language, GeneralApiKeys::$ARABIC_LANGUAGE) == 0) {
             return $language;
         } else {
-            throw new BadInformationException("Accept-Language Value Not Supported Please Send Just en,ar");
+            return "en";
         }
     }
 

@@ -46,8 +46,19 @@ USER www
 # Expose port 9000 and start php-fpm server
 CMD ["php-fpm"]
 
-WORKDIR /app
-COPY . .
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+CMD chmod -R 775 storage/
+
+CMD php artisan cache:clear
+CMD php artisan config:cache
+CMD composer dump-autoload
+CMD php artisan migrate:refresh
 
 CMD php artisan serve --host=0.0.0.0
+
+EXPOSE 80
 EXPOSE 8000
