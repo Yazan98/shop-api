@@ -13,6 +13,7 @@ class CreateShopsMenuItemsSizesTable extends Migration
      */
     public function up()
     {
+        Schema::defaultStringLength(191);
         Schema::create('shops_menu_items_sizes', function (Blueprint $table) {
             $table->id();
             $table->string('nameAr');

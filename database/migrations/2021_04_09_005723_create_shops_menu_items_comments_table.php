@@ -13,6 +13,7 @@ class CreateShopsMenuItemsCommentsTable extends Migration
      */
     public function up()
     {
+        Schema::defaultStringLength(191);
         Schema::create('shops_menu_items_comments', function (Blueprint $table) {
             $table->id();
             $table->string('owner_name');

@@ -13,6 +13,7 @@ class CreatePhoneNumbers extends Migration
      */
     public function up()
     {
+        Schema::defaultStringLength(191);
         Schema::create('phone_numbers', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id');

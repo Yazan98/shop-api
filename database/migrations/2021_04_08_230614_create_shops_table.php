@@ -13,6 +13,7 @@ class CreateShopsTable extends Migration
      */
     public function up()
     {
+        Schema::defaultStringLength(191);
         Schema::create('shops', function (Blueprint $table) {
             $table->id();
             $table->string('nameAr');
